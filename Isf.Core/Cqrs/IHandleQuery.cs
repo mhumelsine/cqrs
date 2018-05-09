@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Isf.Core.Cqrs
 {
-    public interface IHandleQuery<TQuery, TQueryResult>
+    public interface IHandleQuery<TQuery>
     {
-        Task<QueryResult<TQueryResult>> HandleAsync(TQuery query);
+        Task<QueryResult> HandleAsync(TQuery query);
     }
 }

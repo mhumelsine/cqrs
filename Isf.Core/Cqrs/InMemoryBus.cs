@@ -34,4 +34,5 @@ namespace Isf.Core.Cqrs
     }
 
     public class InMemoryCommandBus : InMemorySingleSubscriberBus<Command, CommandResult>, ICommandBus { }
+    public class InMemoryQueryBus : InMemorySingleSubscriberBus<Query, QueryResult>, IQueryBus { }
 }

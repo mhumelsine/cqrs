@@ -1,13 +1,20 @@
-﻿using System;
+﻿using Isf.Core.Cqrs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Inventory.Queries
 {
 
-    public class InventoryItemQuery
+    public class InventoryItemQuery : Query
     {
-        public string LIN { get; set; }
-        public string Description { get; set; }
+        public readonly string LIN;
+        public readonly string Description;
+
+        public InventoryItemQuery(string LIN, string description)
+        {
+            this.LIN = LIN;
+            this.Description = description;
+        }
     }
 }

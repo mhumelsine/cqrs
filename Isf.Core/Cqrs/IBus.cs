@@ -15,7 +15,7 @@ namespace Isf.Core.Cqrs
     }
 
     public interface ICommandBus : ISingleSubscriberBus<Command, CommandResult> { }
-    public interface IQueryBus : ISingleSubscriberBus<Query, QueryResult<object>> { }
+    public interface IQueryBus : ISingleSubscriberBus<Query, QueryResult> { }
 }
 
 

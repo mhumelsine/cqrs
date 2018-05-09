@@ -8,7 +8,7 @@ namespace Isf.Core.Cqrs
 {
     public class IsfCqrsRuntime :
         IMessageHandler<Command, CommandResult>,
-        IMessageHandler<Query, QueryResult<object>>
+        IMessageHandler<Query, QueryResult>
     {
 
         private const string
@@ -16,8 +16,8 @@ namespace Isf.Core.Cqrs
             QUERY_SUFFIX = "Query",
             EVENT_SUFFIX = "Event";
 
-        private CqrsDispatcher<Command, CommandResult> commandDispatcher;
-        private CqrsDispatcher<Query, QueryResult<object>> queryDispatcher;
+        private IDispatcher<Command, CommandResult> commandDispatcher;
+        private IDispatcher<Query, QueryResult> queryDispatcher;
         private readonly IResolver resolver;
         private readonly string[] assembliesToScan;
         private Dictionary<Type, Type> commandHandlerMap = new Dictionary<Type, Type>();
@@ -48,12 +48,12 @@ namespace Isf.Core.Cqrs
 
         public async Task<CommandResult> HandleAsync(Command message)
         {
-            return await commandDispatcher.DispatchAsync(message);
+            return await commandDispatcher.ExecuteAsync(message);
         }
 
-        public async Task<QueryResult<object>> HandleAsync(Query message)
+        public async Task<QueryResult> HandleAsync(Query message)
         {
-            return await queryDispatcher.DispatchAsync(message);
+            return await queryDispatcher.ExecuteAsync(message);
         }
 
         public void Start()
@@ -62,8 +62,17 @@ namespace Isf.Core.Cqrs
             RegisterQueriesAndHandlers();
             //RegisterEventsAndHandlers();
 
-            this.commandDispatcher = new CqrsDispatcher<Command, CommandResult>(commandHandlerMap, resolver);
-            this.queryDispatcher = new CqrsDispatcher<Query, QueryResult<object>>(queryHandlerMap, resolver);
+            this.commandDispatcher = new Dispatcher<Command, CommandResult>(
+                "HandleAsync", 
+                typeof(IHandleCommand<>),
+                commandHandlerMap,
+                resolver);
+
+            this.queryDispatcher = new Dispatcher<Query, QueryResult>(
+                "HandleAsync", 
+                typeof(IHandleQuery<>),
+                queryHandlerMap,
+                resolver);
         }
 
         private IEnumerable<Type> GetAllCommandHandlers()
@@ -73,7 +82,7 @@ namespace Isf.Core.Cqrs
 
         private IEnumerable<Type> GetAllQueryHandlers()
         {
-            return GetAllGenericInterfaceImplementations(typeof(IHandleQuery<,>));
+            return GetAllGenericInterfaceImplementations(typeof(IHandleQuery<>));
         }
 
         private IEnumerable<Type> GetAllGenericInterfaceImplementations(Type genericInterfaceType)

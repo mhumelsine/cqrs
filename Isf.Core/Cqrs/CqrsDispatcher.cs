@@ -25,7 +25,14 @@ namespace Isf.Core.Cqrs
             {
                 var handler = CreateHandler(message.GetType());
 
-                return await ((dynamic)handler).HandleAsync(message);
+                var method = typeof(IHandleCommand<>)
+                    .MakeGenericType(message.GetType())
+                    .GetMethod("HandleAsync");
+
+                var result = await (Task<TExecutionResult>)
+                    method.Invoke(handler, new object[] { message });
+
+                return result;
             }
             catch (Exception ex)
             {

@@ -7,7 +7,12 @@ namespace Isf.Core.Cqrs
 {
     public class Message
     {
-        public Guid Id { get; set; }
+        public readonly Guid Id;
+
+        public Message()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 
     public class Query : Message { }
@@ -51,24 +56,44 @@ namespace Isf.Core.Cqrs
         }
     }
 
-    public class QueryResult<TResult> : ExecutionResult
+    public class QueryResult : ExecutionResult
     {
-        public readonly TResult Result;
-        public QueryResult(ExecutionStatus state, Notification notification, TResult result)
+        public readonly object Result;
+        public QueryResult(ExecutionStatus state, Notification notification, object result)
             :base(state, notification)
         {
             this.Result = result;
         }
 
-        public static QueryResult<TResult> Success(TResult result)
+        public static QueryResult Success(object result)
         {
-            return new QueryResult<TResult>(
+            return new QueryResult(
                 ExecutionStatus.Succeeded, Notification.OK, result);
         }
-        public static Task<QueryResult<TResult>> SuccessAsync(TResult result)
+        public static Task<QueryResult> SuccessAsync(object result)
         {
             return Task.FromResult(Success(result));
         }
     }
-        
+
+    //public class QueryResult<TResult> : ExecutionResult
+    //{
+    //    public readonly TResult Result;
+    //    public QueryResult(ExecutionStatus state, Notification notification, TResult result)
+    //        : base(state, notification)
+    //    {
+    //        this.Result = result;
+    //    }
+
+    //    public static QueryResult<TResult> Success(TResult result)
+    //    {
+    //        return new QueryResult<TResult>(
+    //            ExecutionStatus.Succeeded, Notification.OK, result);
+    //    }
+    //    public static Task<QueryResult<TResult>> SuccessAsync(TResult result)
+    //    {
+    //        return Task.FromResult(Success(result));
+    //    }
+    //}
+
 }

@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace Inventory.Stores
 {
     public class InventoryReadStore :
-        IHandleQuery<InventoryItemQuery, IEnumerable<InventoryItem>>
+        IHandleQuery<InventoryItemQuery>
     {
-        public Task<QueryResult<IEnumerable<InventoryItem>>> HandleAsync(InventoryItemQuery query)
+        public Task<QueryResult> HandleAsync(InventoryItemQuery query)
         {
-            return QueryResult<IEnumerable<InventoryItem>>
+            return QueryResult
                 .SuccessAsync(Enumerable.Empty<InventoryItem>());
         }
     }
