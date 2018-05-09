@@ -17,6 +17,8 @@ namespace Driver
 
         async static Task Try()
         {
+            var resolver = new NaiveResolver();
+
             var command = new CreateInventoryItemCommand
             {
                 LIN = "Michael's"
@@ -24,16 +26,12 @@ namespace Driver
 
             var query = new InventoryItemQuery("LIN", string.Empty);
 
-            var runtime = new IsfCqrsRuntime(new NaiveResolver(), "Inventory");
+            var runtime = new IsfCqrsRuntime(resolver, "Inventory");
 
             runtime.Start();
 
-            ICommandBus bus = new InMemoryCommandBus();
-            IQueryBus qBus = new InMemoryQueryBus();
-
-            //temporary should be in runtime
-            bus.Subscribe(typeof(CreateInventoryItemCommand), runtime);
-            qBus.Subscribe(typeof(InventoryItemQuery), runtime);
+            ICommandBus bus = resolver.Resolve<ICommandBus>();
+            IQueryBus qBus = resolver.Resolve<IQueryBus>();
 
             var result = await bus.PublishAsync(command);
 

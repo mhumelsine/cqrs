@@ -62,6 +62,20 @@ namespace Isf.Core.Cqrs
             RegisterQueriesAndHandlers();
             //RegisterEventsAndHandlers();
 
+            //register all the handlers on the bus
+            var commandBus = resolver.Resolve<ICommandBus>();
+            var queryBus = resolver.Resolve<IQueryBus>();
+
+            foreach(var commandType in commandHandlerMap.Keys)
+            {
+                commandBus.Subscribe(commandType, this);
+            }
+
+            foreach (var queryType in queryHandlerMap.Keys)
+            {
+                queryBus.Subscribe(queryType, this);
+            }
+
             this.commandDispatcher = new Dispatcher<Command, CommandResult>(
                 "HandleAsync", 
                 typeof(IHandleCommand<>),
