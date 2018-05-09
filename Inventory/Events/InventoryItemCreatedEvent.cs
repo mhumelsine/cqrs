@@ -7,13 +7,13 @@ namespace Inventory.Events
 {
     public class InventoryItemCreatedEvent : Event
     {
+        public readonly Guid ItemId;
         public readonly string LIN;
         public readonly string Description;
-        public readonly Guid InventoryId;
 
-        public InventoryItemCreatedEvent(Guid inventoryId, string LIN, string description)
+        public InventoryItemCreatedEvent(Guid itemId, string LIN, string description)
         {
-            this.InventoryId = inventoryId;
+            this.ItemId = itemId;
             this.LIN = LIN;
             this.Description = description;
         }

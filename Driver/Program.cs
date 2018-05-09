@@ -21,7 +21,8 @@ namespace Driver
 
             var command = new CreateInventoryItemCommand
             {
-                LIN = "Michael's"
+                LIN = "Michael's",
+                Description = "Something I'd like to track"
             };
 
             var query = new InventoryItemQuery("LIN", string.Empty);

@@ -1,4 +1,4 @@
-﻿using Inventory.DTOs;
+﻿using Inventory.Entities;
 using Inventory.Queries;
 using Isf.Core.Cqrs;
 using System;
