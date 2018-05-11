@@ -7,6 +7,7 @@ namespace Isf.Core.Cqrs
 {
     public interface IEventBus
     {
-        Task PostEventAsync<TEvent>(TEvent @event) where TEvent : Event;
+        Task PostAsync<TEvent>(DomainEvent domainEvent);
+        Task PostAsync(IEnumerable<DomainEvent> domainEvents);
     }
 }

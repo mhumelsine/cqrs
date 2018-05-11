@@ -19,6 +19,11 @@ namespace Isf.Core.Cqrs
 
     public class Command : Message { }
 
+    public class CommandWithAggregateRootId : Command
+    {
+        public Guid AggregateRootId { get; set; }
+    }
+
     public enum ExecutionStatus
     {
         NotAttempted,
@@ -53,6 +58,18 @@ namespace Isf.Core.Cqrs
         public static CommandResult Success()
         {
             return new CommandResult(ExecutionStatus.Succeeded, Notification.OK);
+        }
+
+        public static CommandResult ValidationFailed(string error, string property)
+        {
+            return new CommandResult(
+                ExecutionStatus.ValidationFailed, 
+                new Notification().AddError(error, property));
+        }
+
+        public static Task<CommandResult> ValidationFailedAsync(string error, string property)
+        {
+            return Task.FromResult(ValidationFailed(error, property));
         }
     }
 

@@ -35,11 +35,12 @@ namespace Isf.Core.Cqrs
             }
         }
 
-        public void AddError(string error)
+        public Notification AddError(string error)
         {
             AddError(error, string.Empty);
+            return this;
         }
-        public void AddError(string error, string property)
+        public Notification AddError(string error, string property)
         {
             List<string> errorList;
 
@@ -51,6 +52,8 @@ namespace Isf.Core.Cqrs
             }
 
             errorList.Add(error);
+
+            return this;
         }
 
         public static Notification Join(params Notification[] notifications)

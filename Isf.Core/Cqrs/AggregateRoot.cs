@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Isf.Core.Cqrs
 {
-    public class AggregateRoot
+    public abstract class AggregateRoot
     {
-        public Guid Id { get; set; }
+        public Guid AggregateRootId { get; protected set; }
 
-        private Queue<Event> uncommittedEvents = new Queue<Event>();
+        public readonly Queue<DomainEvent> UncommittedEvents = new Queue<DomainEvent>();
 
-        protected void Apply(Event @event)
+        protected void Apply(DomainEvent @event)
         {
-            uncommittedEvents.Enqueue(@event);
+            UncommittedEvents.Enqueue(@event);
             ApplyEventToInternalState(@event);
         }
 
-        private void ApplyEventToInternalState(Event @event)
+        private void ApplyEventToInternalState(DomainEvent @event)
         {
             var eventType = @event.GetType();
             var eventTypeName = eventType.Name;
