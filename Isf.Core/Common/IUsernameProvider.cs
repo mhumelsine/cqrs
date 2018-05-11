@@ -8,4 +8,12 @@ namespace Isf.Core.Common
     {
         string GetUsername();
     }
+
+    public class StaticUsernameProvider : IUsernameProvider
+    {
+        public string GetUsername()
+        {
+            return "StaticID";
+        }
+    }
 }

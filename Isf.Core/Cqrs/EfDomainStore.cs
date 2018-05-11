@@ -12,18 +12,25 @@ namespace Isf.Core.Cqrs
         private readonly IEventStore eventStore;
         private readonly IEventBus eventBus;
 
-        public async Task<TAggregateRoot> GetByKeyAsync<TAggregateRoot>(params object[] keys) where TAggregateRoot : AggregateRoot, new()
+        public EfDomainStore(DbContext dbContext, IEventStore eventStore, IEventBus eventBus)
         {
-            return await db.FindAsync<TAggregateRoot>(keys);
+            this.db = dbContext;
+            this.eventStore = eventStore;
+            this.eventBus = eventBus;
         }
 
-        public async Task<TAggregateRoot> GetExistingByIdAsync<TAggregateRoot>(params object[] keys) where TAggregateRoot : AggregateRoot, new()
+        public async Task<TAggregateRoot> GetByIdAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new()
         {
-            var aggregateRoot = await GetByKeyAsync<TAggregateRoot>(keys);
+            return await db.FindAsync<TAggregateRoot>(aggregateRootId);
+        }
+
+        public async Task<TAggregateRoot> GetExistingByIdAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new()
+        {
+            var aggregateRoot = await GetByIdAsync<TAggregateRoot>(aggregateRootId);
 
             if(aggregateRoot == null)
             {
-                throw new AggregateRootNotFoundException<TAggregateRoot>(keys);
+                throw new AggregateRootNotFoundException<TAggregateRoot>(aggregateRootId);
             }
 
             return aggregateRoot;

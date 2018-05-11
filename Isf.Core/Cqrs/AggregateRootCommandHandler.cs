@@ -11,10 +11,12 @@ namespace Isf.Core.Cqrs
         where TCommand : Command
     {
         private readonly IDomainStore store;
+        public readonly IUsernameProvider usernameProvider;
 
         public AggregateRootCommandHandler()
         {
-            this.store = new EfDomainStore();
+            //this.store = new EfDomainStore();
+            this.usernameProvider = new StaticUsernameProvider();
         }
 
         protected abstract void Handle(CommandHandlingContext handlingContext);
@@ -37,7 +39,7 @@ namespace Isf.Core.Cqrs
                 return new CommandResult(ExecutionStatus.ValidationFailed, validationResult);
             }
 
-            var context = new CommandHandlingContext(aggregateRoot, command);
+            var context = new CommandHandlingContext(aggregateRoot, command, usernameProvider);
 
             Handle(context);
 
@@ -57,10 +59,11 @@ namespace Isf.Core.Cqrs
             public TAggregateRoot AggregateRoot { get; set; }
             public TCommand Command { get; set; }
 
-            public CommandHandlingContext(TAggregateRoot aggregateRoot, TCommand command)
+            public CommandHandlingContext(TAggregateRoot aggregateRoot, TCommand command, IUsernameProvider usernameProvider)
             {
                 this.AggregateRoot = aggregateRoot;
                 this.Command = command;
+                this.UsernameProvider = usernameProvider;
             }
         }
     }

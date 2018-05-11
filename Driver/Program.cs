@@ -1,5 +1,4 @@
-﻿using Inventory.Commands;
-using Inventory.Queries;
+﻿using Inventory.Inventory;
 using Isf.Core.Cqrs;
 using System;
 using System.Threading.Tasks;
@@ -19,13 +18,16 @@ namespace Driver
         {
             var resolver = new NaiveResolver();
 
-            var command = new CreateInventoryItemCommand
+            var command = new CreateInventoryMasterCommand
             {
-                LIN = "Michael's",
-                Description = "Something I'd like to track"
+                LIN = "Michael's LIN",
+                GeneralNomenclature = "Something I'd like to track"
             };
 
-            var query = new InventoryItemQuery("LIN", string.Empty);
+            var query = new GetMasterByLINQuery
+            {
+                LIN = "Michael's LIN"
+            };
 
             var runtime = new IsfCqrsRuntime(resolver, "Inventory");
 

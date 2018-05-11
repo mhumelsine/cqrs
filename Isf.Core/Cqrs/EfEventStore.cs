@@ -10,8 +10,7 @@ namespace Isf.Core.Cqrs
     public class EfEventStore : IEventStore
     {
         private readonly DbContext db;
-        private readonly 
-       /private readonly DbSet<DomainEvent> events;
+        private readonly DbSet<DomainEvent> events;
 
         public EfEventStore(DbContext db)
         {

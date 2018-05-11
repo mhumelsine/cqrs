@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Isf.Core.Cqrs
 {
-    public interface IHandleDomainEvents<TEvent>
+    public interface IHandleDomainEvent<TEvent>
     {
         Task HandleAsync(TEvent domainEvent);
     }

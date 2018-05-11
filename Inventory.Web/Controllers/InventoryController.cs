@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Inventory.Commands;
+using Inventory.Inventory;
 using Isf.Core.Cqrs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +39,7 @@ namespace Inventory.Web.Controllers
         // POST: Inventory/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateInventoryItemCommand command)
+        public async Task<ActionResult> Create(CreateInventoryMasterCommand command)
         {
             try
             {

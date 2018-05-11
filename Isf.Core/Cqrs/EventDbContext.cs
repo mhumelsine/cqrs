@@ -9,7 +9,7 @@ namespace Isf.Core.Cqrs
     {
         DbSet<DomainEvent> DomainEvents { get; set; }
 
-        public EventDbContext(DbContextOptions options) : base(options)
+        public EventDbContext(DbContextOptions<EventDbContext> options) : base(options)
         {
 
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
 using System.Text;
 
 namespace Isf.Core.Cqrs
@@ -25,11 +26,12 @@ namespace Isf.Core.Cqrs
             var eventIndex = eventTypeName.LastIndexOf("Event");
             var methodName = $"On{eventTypeName.Remove(eventIndex, 5)}";
 
-            var methodInfo = myType.GetMethod(methodName);
+            var methodInfo = myType.GetMethod(methodName, 
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
             if(methodInfo == null)
             {
-                throw new HandlerNotFoundException(eventType);
+                throw new DomainObjectEventHandlerNotFoundException(methodName, myType);
             }
 
             methodInfo.Invoke(this, new[] { @event });

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Inventory.Commands;
+using Inventory.Inventory;
 using Isf.Core.Cqrs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,7 +26,7 @@ namespace Inventory.Web
             services.AddMvc();
 
             //need the assembly to be loaded, need a better way
-            var command = new CreateInventoryItemCommand();
+            var command = new CreateInventoryMasterCommand();
 
 
             var resolver = new NaiveResolver();

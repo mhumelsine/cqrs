@@ -18,10 +18,11 @@ namespace Isf.Core.Cqrs
 
         private IDispatcher<Command, CommandResult> commandDispatcher;
         private IDispatcher<Query, QueryResult> queryDispatcher;
-        private readonly IResolver resolver;
+        public readonly IResolver resolver;
         private readonly string[] assembliesToScan;
         private Dictionary<Type, Type> commandHandlerMap = new Dictionary<Type, Type>();
         private Dictionary<Type, Type> queryHandlerMap = new Dictionary<Type, Type>();
+        private Dictionary<Type, Type[]> eventHandlerMap = new Dictionary<Type, Type[]>();
 
         private IEnumerable<Type> allTypes;
         private IEnumerable<Type> AllTypes
@@ -60,7 +61,7 @@ namespace Isf.Core.Cqrs
         {
             RegisterCommandsAndHandlers();
             RegisterQueriesAndHandlers();
-            //RegisterEventsAndHandlers();
+            RegisterEventsAndHandlers();
 
             //register all the handlers on the bus
             var commandBus = resolver.Resolve<ICommandBus>();
@@ -99,6 +100,11 @@ namespace Isf.Core.Cqrs
             return GetAllGenericInterfaceImplementations(typeof(IHandleQuery<>));
         }
 
+        private IEnumerable<Type> GetAllEventHandlers()
+        {
+            return GetAllGenericInterfaceImplementations(typeof(IHandleDomainEvent<>));
+        }
+
         private IEnumerable<Type> GetAllGenericInterfaceImplementations(Type genericInterfaceType)
         {
             return AllTypes
@@ -126,35 +132,71 @@ namespace Isf.Core.Cqrs
                 .Where(x => x.Name.EndsWith(EVENT_SUFFIX));
         }
 
-        private void Register(IEnumerable<Type> dtos, IEnumerable<Type> handlers, Dictionary<Type, Type> handlerMap)
+        private IEnumerable<Type> GetHandlersForType(Type type, IEnumerable<Type> handlers)
         {
-            foreach (var dto in dtos)
+            return handlers.Where(h => h.GetInterfaces()
+                .Any(i => i.GetGenericArguments()
+                    .Any(a => a == type)));
+        }
+
+        private void RegisterSingle(Type dto, IEnumerable<Type> handlers, Dictionary<Type, Type> handlerMap)
+        {
+            var foundHandlers = GetHandlersForType(dto, handlers);
+
+            var handler = foundHandlers.FirstOrDefault();
+
+            if (foundHandlers == null || foundHandlers.Count() == 0)
             {
-                var handler = handlers.SingleOrDefault(x => x.GetInterfaces()
-                    .Any(y => y.GetGenericArguments()
-                        .Any(z => z.BaseType == dto.BaseType)));
-
-                if (handler == null)
-                {
-                    throw new HandlerNotFoundException(dto);
-                }
-
-                //throw exception if the handler already exists, should only have 1 handler per request type
-                if (!handlerMap.TryAdd(dto, handler))
-                {
-                    throw new DuplicateHandlerException(dto, handlerMap[dto], handler);
-                }
+                throw new HandlerNotFoundException(dto);
             }
+
+            if (foundHandlers.Count() > 1)
+            {
+                throw new DuplicateHandlerException(dto, handlerMap[dto], handler);
+            }
+
+            //throw exception if the handler already exists, should only have 1 handler per request type
+            if (!handlerMap.TryAdd(dto, handler))
+            {
+                throw new DuplicateHandlerException(dto, handlerMap[dto], handler);
+            }
+        }
+
+        private void RegisterMultiple(Type dto, IEnumerable<Type> handlers, Dictionary<Type, Type[]> handlerMap)
+        {
+            var foundHandlers = GetHandlersForType(dto, handlers);
+
+            //events might not have any handlers
+            //this is not an exception
+
+            if(foundHandlers.Count() > 0)
+            {
+                handlerMap.Add(dto, foundHandlers.ToArray());
+            }
+            
         }
 
         private void RegisterCommandsAndHandlers()
         {
-            Register(GetAllCommands(), GetAllCommandHandlers(), commandHandlerMap);
+            foreach (var command in GetAllCommands()) {
+                RegisterSingle(command, GetAllCommandHandlers(), commandHandlerMap);
+            }
         }
 
         private void RegisterQueriesAndHandlers()
         {
-            Register(GetAllQueries(), GetAllQueryHandlers(), queryHandlerMap);
+            foreach (var query in GetAllQueries())
+            {
+                RegisterSingle(query, GetAllQueryHandlers(), queryHandlerMap);
+            }
+        }
+
+        private void RegisterEventsAndHandlers()
+        {
+            foreach (var e in GetAllEvents())
+            {
+                RegisterMultiple(e, GetAllEventHandlers(), eventHandlerMap);
+            }
         }
     }
 }

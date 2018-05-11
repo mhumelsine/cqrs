@@ -10,11 +10,4 @@ namespace Isf.Core.Cqrs
     {
         Task<CommandResult> HandleAsync(TCommand command);
     }
-
-    public interface IHandleAggregateRootCommand<TAggregateRoot, TCommand>
-        where TAggregateRoot : AggregateRoot
-        where TCommand : CommandWithAggregateRoot<TAggregateRoot>
-    {
-        Task<CommandResult> HandleAsync(ICommandHandlingContext<TCommand, TAggregateRoot> handlingContext);
-    }
 }

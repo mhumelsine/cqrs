@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Isf.Core.Cqrs
 {
-    public class DomainEvent
+    public class DomainEvent : Message
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

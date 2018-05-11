@@ -59,7 +59,7 @@ namespace Inventory.Inventory
 
         public void Delete()
         {
-            Apply(new InventoryMasterDeletedEvent)
+        //    Apply(new InventoryMasterDeletedEvent)
         }
 
 
