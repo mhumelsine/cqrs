@@ -3,7 +3,7 @@ using System;
 
 namespace Inventory.Inventory
 {
-    public class CreateInventoryMasterCommand : Command
+    public class CreateInventoryMasterCommand : CommandWithAggregateRootId
     {
         public string LIN { get; set; }
 

@@ -27,7 +27,7 @@ namespace Isf.Core.Cqrs
 
             TAggregateRoot aggregateRoot = null;
 
-            if (commandWithAggregateRootId != null)
+            if (commandWithAggregateRootId != null && commandWithAggregateRootId.AggregateRootId != Guid.Empty)
             {
                 aggregateRoot = await store.GetExistingByIdAsync<TAggregateRoot>(commandWithAggregateRootId.AggregateRootId);
             }
@@ -44,6 +44,9 @@ namespace Isf.Core.Cqrs
             Handle(context);
 
             await store.SaveAsync(context.AggregateRoot);
+
+            //set after DB write or object creation
+            commandWithAggregateRootId.AggregateRootId = context.AggregateRoot.AggregateRootId;
 
             return CommandResult.Success();
         }

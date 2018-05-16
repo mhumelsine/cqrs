@@ -42,6 +42,8 @@ namespace Isf.Core.Cqrs
 
             await eventStore.SaveAsync(events);
 
+            db.Attach(aggregateRoot);
+
             await db.SaveChangesAsync();
 
             await eventBus.PostAsync(events);

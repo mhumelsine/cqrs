@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.Inventory;
+using Inventory.Web.Common;
 using Isf.Core.Cqrs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace Inventory.Web.Controllers
     public class InventoryController : Controller
     {
         private readonly ICommandBus commandBus;
+        private readonly IQueryBus queryBus;
 
-        public InventoryController(ICommandBus commandBus)
+        public InventoryController(ICommandBus commandBus, IQueryBus queryBus)
         {
             this.commandBus = commandBus;
+            this.queryBus = queryBus;
         }
 
         // GET: Inventory
@@ -50,48 +53,72 @@ namespace Inventory.Web.Controllers
 
                 var result = await commandBus.PublishAsync(command);
 
-                if(result.State == ExecutionStatus.Succeeded)
+                if (result.State == ExecutionStatus.Succeeded)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Edit), new { aggregateRootId = command.AggregateRootId });
                 }
                 else
                 {
-                    //put in lib function
-                    foreach(var prop in result.Notification.ErrorDictionary)
-                    {
-                        foreach(var error in prop.Value)
-                        {
-                            ModelState.AddModelError(prop.Key, error);
-                        }
-                        
-                    }
+                    ModelState.AddModelErrors(result.Notification);
                     return View();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return View();
             }
         }
 
         // GET: Inventory/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(GetMasterByIdQuery query)
         {
-            return View();
+            var result = await queryBus.PublishAsync(query);
+            var inventoryMaster = result.Result as InventoryMaster;
+
+            if (inventoryMaster == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            //maybe need auto mapper here?
+            var command = new UpdateInventoryMasterCommand
+            {
+                LIN = inventoryMaster.LIN,
+                AggregateRootId = inventoryMaster.AggregateRootId,
+                GeneralNomenclature = inventoryMaster.GeneralNomenclature,
+                IsGArmy = inventoryMaster.IsGArmy,
+                Status = inventoryMaster.Status,
+                TrackingType = inventoryMaster.TrackingType
+            };
+
+            return View(command);
         }
 
         // POST: Inventory/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(UpdateInventoryMasterCommand command)
         {
             try
             {
-                // TODO: Add update logic here
+                if (!ModelState.IsValid)
+                {
+                    return View(command);
+                }
 
-                return RedirectToAction(nameof(Index));
+                var result = await commandBus.PublishAsync(command);
+
+                if (result.State == ExecutionStatus.Succeeded)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelErrors(result.Notification);
+                    return View();
+                }
             }
-            catch
+            catch (Exception ex)
             {
                 return View();
             }

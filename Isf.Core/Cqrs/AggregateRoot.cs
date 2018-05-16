@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Isf.Core.Cqrs
 {
     public abstract class AggregateRoot
     {
+        [Key]
         public Guid AggregateRootId { get; protected set; }
 
         public readonly Queue<DomainEvent> UncommittedEvents = new Queue<DomainEvent>();

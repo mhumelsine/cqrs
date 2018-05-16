@@ -7,8 +7,7 @@ using System.Text;
 namespace Inventory.Inventory
 {
     public class InventoryMaster : AggregateRoot
-    {
-        [Key]
+    {        
         public int Id { get; set; }
         public string LIN { get; set; }
 
