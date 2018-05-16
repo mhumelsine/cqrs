@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Inventory.Infrastructure;
 using Inventory.Inventory;
 using Isf.Core.Cqrs;
 using Microsoft.AspNetCore.Builder;

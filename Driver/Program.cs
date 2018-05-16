@@ -1,4 +1,5 @@
-﻿using Inventory.Inventory;
+﻿using Inventory.Infrastructure;
+using Inventory.Inventory;
 using Isf.Core.Cqrs;
 using System;
 using System.Threading.Tasks;

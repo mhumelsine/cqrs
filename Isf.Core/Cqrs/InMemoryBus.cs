@@ -53,8 +53,9 @@ namespace Isf.Core.Cqrs
                     return await handler.HandleAsync(message);
                 }
             }
-
-            throw new HandlerNotFoundException(typeof(TMessage));
+            //probably don't need as there could be no subs
+            //throw new HandlerNotFoundException(typeof(TMessage));
+            return await Task.FromResult((TExecutionResult)new ExecutionResult(ExecutionStatus.NotAttempted, new Notification()));
         }
 
         public void Subscribe(Type messageType, IMessageHandler<TMessage, TExecutionResult> handler)

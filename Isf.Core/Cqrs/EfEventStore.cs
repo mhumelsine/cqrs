@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,7 +68,17 @@ namespace Isf.Core.Cqrs
 
         public async Task SaveAsync(IEnumerable<DomainEvent> domainEvents)
         {
-            await events.AddRangeAsync(domainEvents);
+            var events = new List<DomainEvent>();
+
+            foreach(var e in domainEvents)
+            {
+                events.Add(new DomainEvent(e.AggregateRootId, e.EventSequence, e.UserCreated)
+                {
+                    EventData = JsonConvert.SerializeObject(e)
+                });
+            }
+
+            //await events.AddRangeAsync(domainEvents);
 
             await db.SaveChangesAsync();
         }

@@ -15,8 +15,8 @@ namespace Isf.Core.Cqrs
 
         public AggregateRootCommandHandler()
         {
-            //this.store = new EfDomainStore();
-            this.usernameProvider = new StaticUsernameProvider();
+            this.store = IsfCqrsRuntime.Resolver.Resolve<IDomainStore>();
+            this.usernameProvider = IsfCqrsRuntime.Resolver.Resolve<IUsernameProvider>();
         }
 
         protected abstract void Handle(CommandHandlingContext handlingContext);
@@ -27,10 +27,10 @@ namespace Isf.Core.Cqrs
 
             TAggregateRoot aggregateRoot = null;
 
-            if(commandWithAggregateRootId != null)
+            if (commandWithAggregateRootId != null)
             {
                 aggregateRoot = await store.GetExistingByIdAsync<TAggregateRoot>(commandWithAggregateRootId.AggregateRootId);
-            }            
+            }
 
             var validationResult = await ValidateAsync(aggregateRoot, command);
 
@@ -46,7 +46,7 @@ namespace Isf.Core.Cqrs
             await store.SaveAsync(context.AggregateRoot);
 
             return CommandResult.Success();
-        }        
+        }
 
         protected virtual Task<Notification> ValidateAsync(TAggregateRoot aggregateRoot, TCommand command)
         {

@@ -18,6 +18,8 @@ namespace Isf.Core.Cqrs
         public string UserCreated { get; set; }
         public int EventSequence { get; set; }
 
+        public string EventData { get; set; }
+
         public DomainEvent()
         {
 

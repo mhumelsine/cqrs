@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\Inventory\Inventory.csproj" />
     <ProjectReference Include="..\Isf.Core\Isf.Core.csproj" />
   </ItemGroup>

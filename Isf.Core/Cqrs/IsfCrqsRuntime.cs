@@ -16,9 +16,10 @@ namespace Isf.Core.Cqrs
             QUERY_SUFFIX = "Query",
             EVENT_SUFFIX = "Event";
 
+        public static IResolver Resolver;
+
         private IDispatcher<Command, CommandResult> commandDispatcher;
         private IDispatcher<Query, QueryResult> queryDispatcher;
-        public readonly IResolver resolver;
         private readonly string[] assembliesToScan;
         private Dictionary<Type, Type> commandHandlerMap = new Dictionary<Type, Type>();
         private Dictionary<Type, Type> queryHandlerMap = new Dictionary<Type, Type>();
@@ -42,7 +43,7 @@ namespace Isf.Core.Cqrs
 
         public IsfCqrsRuntime(IResolver resolver, params string[] assembliesToScan)
         {
-            this.resolver = resolver;
+            Resolver = resolver;
             this.assembliesToScan = assembliesToScan;
         }
 
@@ -64,8 +65,8 @@ namespace Isf.Core.Cqrs
             RegisterEventsAndHandlers();
 
             //register all the handlers on the bus
-            var commandBus = resolver.Resolve<ICommandBus>();
-            var queryBus = resolver.Resolve<IQueryBus>();
+            var commandBus = Resolver.Resolve<ICommandBus>();
+            var queryBus = Resolver.Resolve<IQueryBus>();
 
             foreach(var commandType in commandHandlerMap.Keys)
             {
@@ -81,13 +82,13 @@ namespace Isf.Core.Cqrs
                 "HandleAsync", 
                 typeof(IHandleCommand<>),
                 commandHandlerMap,
-                resolver);
+                Resolver);
 
             this.queryDispatcher = new Dispatcher<Query, QueryResult>(
                 "HandleAsync", 
                 typeof(IHandleQuery<>),
                 queryHandlerMap,
-                resolver);
+                Resolver);
         }
 
         private IEnumerable<Type> GetAllCommandHandlers()
