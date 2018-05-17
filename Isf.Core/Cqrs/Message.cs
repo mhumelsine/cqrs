@@ -15,11 +15,11 @@ namespace Isf.Core.Cqrs
         }
     }
 
-    public class Query : Message { }
+    public abstract class Query : Message { }
 
-    public class Command : Message { }
+    public abstract class Command : Message { }
 
-    public class CommandWithAggregateRootId : Command
+    public abstract class CommandWithAggregateRootId : Command
     {
         public Guid AggregateRootId { get; set; }
     }

@@ -15,8 +15,8 @@ namespace Isf.Core.Cqrs
 
         public AggregateRootCommandHandler()
         {
-            this.store = IsfCqrsRuntime.Resolver.Resolve<IDomainStore>();
-            this.usernameProvider = IsfCqrsRuntime.Resolver.Resolve<IUsernameProvider>();
+            this.store = IsfCqrsRuntime.Current.Resolver.Resolve<IDomainStore>();
+            this.usernameProvider = IsfCqrsRuntime.Current.Resolver.Resolve<IUsernameProvider>();
         }
 
         protected abstract void Handle(CommandHandlingContext handlingContext);
@@ -45,7 +45,7 @@ namespace Isf.Core.Cqrs
 
             await store.SaveAsync(context.AggregateRoot);
 
-            //set after DB write or object creation
+            //set after DB write
             commandWithAggregateRootId.AggregateRootId = context.AggregateRoot.AggregateRootId;
 
             return CommandResult.Success();

@@ -16,11 +16,13 @@ namespace Isf.Core.Cqrs
             QUERY_SUFFIX = "Query",
             EVENT_SUFFIX = "Event";
 
-        public static IResolver Resolver;
 
+        public static IsfCqrsRuntime Current;
+
+        public IResolver Resolver;
         private IDispatcher<Command, CommandResult> commandDispatcher;
         private IDispatcher<Query, QueryResult> queryDispatcher;
-        private readonly string[] assembliesToScan;
+        private string[] assembliesToScan;
         private Dictionary<Type, Type> commandHandlerMap = new Dictionary<Type, Type>();
         private Dictionary<Type, Type> queryHandlerMap = new Dictionary<Type, Type>();
         private Dictionary<Type, Type[]> eventHandlerMap = new Dictionary<Type, Type[]>();
@@ -41,12 +43,24 @@ namespace Isf.Core.Cqrs
             }
         }
 
-        public IsfCqrsRuntime(IResolver resolver, params string[] assembliesToScan)
+        private IEnumerable<Type> AllConcreteTypes
         {
-            Resolver = resolver;
-            this.assembliesToScan = assembliesToScan;
+            get
+            {
+                return AllTypes.Where(x => !x.IsAbstract && !x.IsInterface);
+            }
         }
 
+        private IsfCqrsRuntime(IResolver resolver, string[] assembliesToScan)
+        {
+            this.assembliesToScan = assembliesToScan;
+            this.Resolver = resolver;
+        }
+
+        public void SetResolver(IResolver resolver)
+        {
+            Resolver = resolver;
+        }
 
         public async Task<CommandResult> HandleAsync(Command message)
         {
@@ -58,7 +72,20 @@ namespace Isf.Core.Cqrs
             return await queryDispatcher.ExecuteAsync(message);
         }
 
-        public void Start()
+        public static void Start(IResolver resovler, params string[] assembliesToScan)
+        {
+            if(Current != null)
+            {
+                throw new InvalidOperationException(
+                    "The runtime has already started");
+            }
+
+            Current = new IsfCqrsRuntime(resovler, assembliesToScan);
+
+            Current.Bootstrap();
+        }
+
+        private void Bootstrap()
         {
             RegisterCommandsAndHandlers();
             RegisterQueriesAndHandlers();
@@ -68,7 +95,7 @@ namespace Isf.Core.Cqrs
             var commandBus = Resolver.Resolve<ICommandBus>();
             var queryBus = Resolver.Resolve<IQueryBus>();
 
-            foreach(var commandType in commandHandlerMap.Keys)
+            foreach (var commandType in commandHandlerMap.Keys)
             {
                 commandBus.Subscribe(commandType, this);
             }
@@ -79,13 +106,13 @@ namespace Isf.Core.Cqrs
             }
 
             this.commandDispatcher = new Dispatcher<Command, CommandResult>(
-                "HandleAsync", 
+                "HandleAsync",
                 typeof(IHandleCommand<>),
                 commandHandlerMap,
                 Resolver);
 
             this.queryDispatcher = new Dispatcher<Query, QueryResult>(
-                "HandleAsync", 
+                "HandleAsync",
                 typeof(IHandleQuery<>),
                 queryHandlerMap,
                 Resolver);
@@ -117,19 +144,19 @@ namespace Isf.Core.Cqrs
 
         private IEnumerable<Type> GetAllCommands()
         {
-            return AllTypes
+            return AllConcreteTypes
                 .Where(x => x.Name.EndsWith(COMMAND_SUFFIX));
         }
 
         private IEnumerable<Type> GetAllQueries()
         {
-            return AllTypes
+            return AllConcreteTypes
                 .Where(x => x.Name.EndsWith(QUERY_SUFFIX));
         }
 
         private IEnumerable<Type> GetAllEvents()
         {
-            return AllTypes
+            return AllConcreteTypes
                 .Where(x => x.Name.EndsWith(EVENT_SUFFIX));
         }
 
@@ -170,16 +197,17 @@ namespace Isf.Core.Cqrs
             //events might not have any handlers
             //this is not an exception
 
-            if(foundHandlers.Count() > 0)
+            if (foundHandlers.Count() > 0)
             {
                 handlerMap.Add(dto, foundHandlers.ToArray());
             }
-            
+
         }
 
         private void RegisterCommandsAndHandlers()
         {
-            foreach (var command in GetAllCommands()) {
+            foreach (var command in GetAllCommands())
+            {
                 RegisterSingle(command, GetAllCommandHandlers(), commandHandlerMap);
             }
         }

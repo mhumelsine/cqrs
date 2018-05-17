@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Isf.Core.Cqrs
 {
-    public class EfDomainStore : IDomainStore
+    public abstract class EfDomainStore : IDomainStore
     {
         private readonly DbContext db;
         private readonly IEventStore eventStore;
@@ -36,15 +36,22 @@ namespace Isf.Core.Cqrs
             return aggregateRoot;
         }
 
-        public async Task SaveAsync(AggregateRoot aggregateRoot)
+        public async Task SaveAsync<TAggregateRoot>(TAggregateRoot aggregateRoot) where TAggregateRoot : AggregateRoot, new()
         {
             var events = aggregateRoot.UncommittedEvents;
 
             await eventStore.SaveAsync(events);
 
-            db.Attach(aggregateRoot);
+            aggregateRoot.UncommittedEvents.Clear();
 
-            await db.SaveChangesAsync();
+            var entry = db.Entry<TAggregateRoot>(aggregateRoot);
+
+            if(entry == null || entry.State == EntityState.Detached)
+            {
+                db.Set<TAggregateRoot>().Add(aggregateRoot);
+            }
+
+            await db.SaveChangesAsync();            
 
             await eventBus.PostAsync(events);
         }

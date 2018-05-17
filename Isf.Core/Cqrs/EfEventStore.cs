@@ -10,10 +10,10 @@ namespace Isf.Core.Cqrs
 {
     public class EfEventStore : IEventStore
     {
-        private readonly DbContext db;
+        private readonly EventDbContext db;
         private readonly DbSet<DomainEvent> events;
 
-        public EfEventStore(DbContext db)
+        public EfEventStore(EventDbContext db)
         {
             this.db = db;
             this.events = db.Set<DomainEvent>();
