@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Isf.Core.Cqrs.DomainEvent>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventTimestamp)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AggregateRootId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserCreated)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSequence)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventData)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventTimestamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AggregateRootId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserCreated)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventSequence)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EventData)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

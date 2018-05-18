@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Inventory.Infrastructure;
 using Inventory.Inventory;
+using Isf.Core.Common;
 using Isf.Core.Cqrs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,16 +31,24 @@ namespace Inventory.Web
             //need the assembly to be loaded, need a better way
             var command = new CreateInventoryMasterCommand();
 
+            services.AddDbContext<EventDbContext>(options =>
+                options.UseSqlite("Data Source = events.db"));
+            //options.UseSqlServer(Configuration.GetConnectionString("EventContext")));
 
-            var resolver = new NaiveResolver();
+            services.AddDbContext<DomainDbContext>(options =>
+            options.UseSqlite("Data Source = domain.db"));
+            //options.UseSqlServer(Configuration.GetConnectionString("DomainContext")));
 
-            //this should go somewhere else
-            var runtime = new IsfCqrsRuntime(resolver, "Inventory");
 
-            runtime.Start();
+            var qb = new InMemoryQueryBus();
+            var cb = new InMemoryCommandBus();
 
-            services.AddSingleton<ICommandBus>(resolver.Resolve<ICommandBus>());
-            services.AddSingleton<IQueryBus>(resolver.Resolve<IQueryBus>());
+            services.AddSingleton<ICommandBus, InMemoryCommandBus>(x => cb);
+            services.AddSingleton<IQueryBus, InMemoryQueryBus>(x => qb);
+            services.AddSingleton<IEventBus, InMemoryEventBus>();
+            services.AddScoped<IEventStore, EfEventStore>();
+            services.AddScoped<IDomainStore, DomainStore>();
+            services.AddScoped<IUsernameProvider, StaticUsernameProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,11 +66,29 @@ namespace Inventory.Web
 
             app.UseStaticFiles();
 
+            //somehow not resolving the services here like it should
+            //MS says services are available at this point
+
+           // app.Req
+
+           // var s = app.ApplicationServices.GetRequiredService<IEventStore>();
+
+            IsfCqrsRuntime.Start(new CoreResolver(app.ApplicationServices), "Inventory");
+
+
+            //set the current resolver
+            app.Use(async (context, successor) =>
+            {
+                IsfCqrsRuntime.Current.SetResolver(new CoreResolver(context.RequestServices));
+
+                await successor.Invoke();
+            });
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Inventory}/{action=Index}/{id?}");
             });
         }
     }

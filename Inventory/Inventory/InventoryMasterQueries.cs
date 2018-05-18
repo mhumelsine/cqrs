@@ -14,4 +14,15 @@ namespace Inventory.Inventory
     {
         public string LIN { get; set; }
     }
+
+    public class GetMasterByNonmicalture : Query
+    {
+        public string GeneralNominclature { get; set; }
+    }
+
+    public class GetTopInventoryMastersQuery : Query
+    {
+        public string LIN { get; set; }
+        public string GeneralNominclature { get; set; }
+    }
 }

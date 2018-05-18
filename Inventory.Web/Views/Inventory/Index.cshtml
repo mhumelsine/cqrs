@@ -1,7 +1,71 @@
-﻿
+﻿@model IEnumerable<Inventory.Inventory.InventoryMaster>
+
 @{
     ViewData["Title"] = "Index";
 }
 
 <h2>Index</h2>
 
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LIN)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GeneralNomenclature)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IsGArmy)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TrackingType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AggregateRootId)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LIN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GeneralNomenclature)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsGArmy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrackingType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AggregateRootId)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { aggregateRootId = item.AggregateRootId }) |
+                @Html.ActionLink("Details", "Details", new { aggregateRootId = item.AggregateRootId }) |
+                @Html.ActionLink("Delete", "Delete", new { aggregateRootId = item.AggregateRootId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

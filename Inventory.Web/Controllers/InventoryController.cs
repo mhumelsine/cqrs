@@ -22,15 +22,27 @@ namespace Inventory.Web.Controllers
         }
 
         // GET: Inventory
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            var query = new GetTopInventoryMastersQuery();
+
+            var result = await queryBus.PublishAsync(query);
+
+            return View(result.Result);
         }
 
         // GET: Inventory/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(GetMasterByIdQuery query)
         {
-            return View();
+            var result = await queryBus.PublishAsync(query);
+            var inventoryMaster = result.Result as InventoryMaster;
+
+            if (inventoryMaster == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(inventoryMaster);
         }
 
         // GET: Inventory/Create
@@ -55,7 +67,7 @@ namespace Inventory.Web.Controllers
 
                 if (result.State == ExecutionStatus.Succeeded)
                 {
-                    return RedirectToAction(nameof(Edit), new { aggregateRootId = command.AggregateRootId });
+                    return RedirectToAction(nameof(Index));
                 }
                 else
                 {
