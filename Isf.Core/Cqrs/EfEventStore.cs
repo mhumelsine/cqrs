@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,17 +72,32 @@ namespace Isf.Core.Cqrs
         {
             var events = new List<DomainEvent>();
 
-            foreach(var e in domainEvents)
+            foreach (var e in domainEvents)
             {
                 events.Add(new DomainEvent(e.AggregateRootId, e.EventSequence, e.UserCreated)
                 {
-                    EventData = JsonConvert.SerializeObject(e)
+                    EventData = JsonConvert.SerializeObject(GetOwnPropsEvent(e))
                 });
             }
 
-            //await events.AddRangeAsync(domainEvents);
+            await db.Set<DomainEvent>().AddRangeAsync(events);
 
             await db.SaveChangesAsync();
+        }
+
+        private object GetOwnPropsEvent(DomainEvent e)
+        {
+            IDictionary<string, object> dynamicEvent = new ExpandoObject();
+
+            var props = e.GetType()
+                .GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+            foreach (var property in props)
+            {
+                dynamicEvent[property.Name] = property.GetValue(e);
+            }
+
+            return dynamicEvent;
         }
     }
 }
