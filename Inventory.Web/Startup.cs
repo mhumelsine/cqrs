@@ -64,7 +64,7 @@ namespace Inventory.Web
             app.UseStaticFiles();
 
             //start the CQRS runtime
-            app.UseCqrs("Inventory");
+            app.UseCqrs(assembliesToScan: "Inventory");
 
             app.UseMvc(routes =>
             {
