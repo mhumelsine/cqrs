@@ -8,6 +8,6 @@ namespace Isf.Core.Cqrs
     public interface IValidateCommand<TCommand>
         where TCommand : Command
     {
-        Task<CommandResult> ValidateAsync(TCommand command);
+        Task<Notification> ValidateAsync(ICommandHandlingContext<TCommand> context);
     }
 }

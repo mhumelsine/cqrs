@@ -3,46 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Inventory.Inventory;
-using Inventory.Web.Common;
 using Isf.Core.Cqrs;
+using Isf.Core.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.Web.Controllers
 {
-    public class InventoryController : Controller
+    public class InventoryController : CqrsMvcController
     {
-        private readonly ICommandBus commandBus;
-        private readonly IQueryBus queryBus;
-
-        public InventoryController(ICommandBus commandBus, IQueryBus queryBus)
-        {
-            this.commandBus = commandBus;
-            this.queryBus = queryBus;
-        }
-
         // GET: Inventory
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            var query = new GetTopInventoryMastersQuery();
-
-            var result = await queryBus.PublishAsync(query);
-
-            return View(result.Result);
+            return await DispatchQueryAsync(new GetTopInventoryMastersQuery());
         }
 
         // GET: Inventory/Details/5
-        public async Task<ActionResult> Details(GetMasterByIdQuery query)
+        public async Task<IActionResult> Details(GetMasterByIdQuery query)
         {
-            var result = await queryBus.PublishAsync(query);
-            var inventoryMaster = result.Result as InventoryMaster;
-
-            if (inventoryMaster == null)
+            return await DispatchQueryAsync(query, q =>
             {
-                return RedirectToAction(nameof(Index));
-            }
+                var inventoryMaster = q.Result as InventoryMaster;
 
-            return View(inventoryMaster);
+                if (inventoryMaster == null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(inventoryMaster);
+            });
         }
 
         // GET: Inventory/Create
@@ -54,86 +43,44 @@ namespace Inventory.Web.Controllers
         // POST: Inventory/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateInventoryMasterCommand command)
+        public async Task<IActionResult> Create(CreateInventoryMasterCommand command)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View(command);
-                }
-
-                var result = await commandBus.PublishAsync(command);
-
-                if (result.State == ExecutionStatus.Succeeded)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelErrors(result.Notification);
-                    return View();
-                }
-            }
-            catch (Exception ex)
-            {
-                return View();
-            }
+            return await DispatchCommandAsync(command, c => RedirectToAction(nameof(Index)));
         }
 
         // GET: Inventory/Edit/5
-        public async Task<ActionResult> Edit(GetMasterByIdQuery query)
+        public async Task<IActionResult> Edit(GetMasterByIdQuery query)
         {
-            var result = await queryBus.PublishAsync(query);
-            var inventoryMaster = result.Result as InventoryMaster;
-
-            if (inventoryMaster == null)
+            return await DispatchQueryAsync(query, q =>
             {
-                return RedirectToAction(nameof(Index));
-            }
+                var inventoryMaster = q.Result as InventoryMaster;
 
-            //maybe need auto mapper here?
-            var command = new UpdateInventoryMasterCommand
-            {
-                LIN = inventoryMaster.LIN,
-                AggregateRootId = inventoryMaster.AggregateRootId,
-                GeneralNomenclature = inventoryMaster.GeneralNomenclature,
-                IsGArmy = inventoryMaster.IsGArmy,
-                Status = inventoryMaster.Status,
-                TrackingType = inventoryMaster.TrackingType
-            };
+                if (inventoryMaster == null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
 
-            return View(command);
+                //maybe need auto mapper here?
+                var command = new UpdateInventoryMasterCommand
+                {
+                    LIN = inventoryMaster.LIN,
+                    AggregateRootId = inventoryMaster.AggregateRootId,
+                    GeneralNomenclature = inventoryMaster.GeneralNomenclature,
+                    IsGArmy = inventoryMaster.IsGArmy,
+                    Status = inventoryMaster.Status,
+                    TrackingType = inventoryMaster.TrackingType
+                };
+
+                return View(command);
+            });            
         }
 
         // POST: Inventory/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(UpdateInventoryMasterCommand command)
+        public async Task<IActionResult> Edit(UpdateInventoryMasterCommand command)
         {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return View(command);
-                }
-
-                var result = await commandBus.PublishAsync(command);
-
-                if (result.State == ExecutionStatus.Succeeded)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-                else
-                {
-                    ModelState.AddModelErrors(result.Notification);
-                    return View();
-                }
-            }
-            catch (Exception ex)
-            {
-                return View();
-            }
+            return await DispatchCommandAsync(command, c => RedirectToAction(nameof(Index)));
         }
 
         // GET: Inventory/Delete/5

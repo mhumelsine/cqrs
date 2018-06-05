@@ -19,6 +19,13 @@ namespace Isf.Core.Cqrs
             this.eventBus = eventBus;
         }
 
+        public async Task DeleteAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new()
+        {
+            var aggregateRoot = await GetByIdAsync<TAggregateRoot>(aggregateRootId);
+
+            db.Remove(aggregateRoot);
+        }
+
         public async Task<TAggregateRoot> GetByIdAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new()
         {
             return await db.FindAsync<TAggregateRoot>(aggregateRootId);

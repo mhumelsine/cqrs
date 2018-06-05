@@ -9,8 +9,8 @@ namespace Isf.Core.Cqrs
     public interface IResolver
     {
         void Register<TAbstract, TConcrete>();
-        T Resolve<T>();
-        object Resolve(Type type);
+        T GetMe<T>();
+        object GetMe(Type type);
     }
 
     

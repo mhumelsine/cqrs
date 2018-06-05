@@ -23,5 +23,12 @@ namespace Inventory.Web.Controllers
 
             return View(events);
         }
+
+        public async Task<ActionResult> Details(Guid id)
+        {
+            var events = await eventStore.GetEventsAsync(id, 0);
+
+            return View(events);
+        }
     }
 }

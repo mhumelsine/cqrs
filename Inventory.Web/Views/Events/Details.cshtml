@@ -1,0 +1,60 @@
+﻿@model Isf.Core.Cqrs.DomainEvent
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<h4>DomainEvent</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Details">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EventId" class="control-label"></label>
+                <input asp-for="EventId" class="form-control" />
+                <span asp-validation-for="EventId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventName" class="control-label"></label>
+                <input asp-for="EventName" class="form-control" />
+                <span asp-validation-for="EventName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventTimestamp" class="control-label"></label>
+                <input asp-for="EventTimestamp" class="form-control" />
+                <span asp-validation-for="EventTimestamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AggregateRootId" class="control-label"></label>
+                <input asp-for="AggregateRootId" class="form-control" />
+                <span asp-validation-for="AggregateRootId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserCreated" class="control-label"></label>
+                <input asp-for="UserCreated" class="form-control" />
+                <span asp-validation-for="UserCreated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventSequence" class="control-label"></label>
+                <input asp-for="EventSequence" class="form-control" />
+                <span asp-validation-for="EventSequence" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EventData" class="control-label"></label>
+                <input asp-for="EventData" class="form-control" />
+                <span asp-validation-for="EventData" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

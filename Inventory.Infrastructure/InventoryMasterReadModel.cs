@@ -3,6 +3,7 @@ using Isf.Core.Cqrs;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,21 +18,27 @@ namespace Inventory.Infrastructure
 
         public async Task<QueryResult> HandleAsync(GetMasterByIdQuery query)
         {
-            var db = IsfCqrsRuntime.Current.Resolver.Resolve<IDomainStore>();
+            var db = CqrsRuntime.Current.Resolver.GetMe<IDomainStore>();
 
             var item = await db.GetByIdAsync<InventoryMaster>(query.AggregateRootId);
 
             return QueryResult.Success(item);
         }
 
-        public Task<QueryResult> HandleAsync(GetMasterByLINQuery query)
+        public async Task<QueryResult> HandleAsync(GetMasterByLINQuery query)
         {
-            throw new NotImplementedException();
+            var db = CqrsRuntime.Current.Resolver.GetMe<DomainDbContext>();
+
+            var items = await db.InventoryMasters
+                .Where(x => x.LIN == query.LIN)
+                .ToListAsync();
+
+            return QueryResult.Success(items);
         }
 
         public async Task<QueryResult> HandleAsync(GetTopInventoryMastersQuery query)
         {
-            var db = IsfCqrsRuntime.Current.Resolver.Resolve<DomainDbContext>();
+            var db = CqrsRuntime.Current.Resolver.GetMe<DomainDbContext>();
 
             //cheating b/c using in memory DB
             var list = await db.Set<InventoryMaster>().ToListAsync();

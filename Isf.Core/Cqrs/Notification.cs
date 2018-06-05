@@ -66,7 +66,7 @@ namespace Isf.Core.Cqrs
                 {
                     foreach (var error in propertyError.Value)
                     {
-                        notification.AddError(propertyError.Key, error);
+                        notification.AddError(error, propertyError.Key);
                     }
                 }
             }

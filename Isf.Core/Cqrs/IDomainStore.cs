@@ -9,6 +9,7 @@ namespace Isf.Core.Cqrs
     {
         Task<TAggregateRoot> GetByIdAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new();
         Task<TAggregateRoot> GetExistingByIdAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new();
+        Task DeleteAsync<TAggregateRoot>(Guid aggregateRootId) where TAggregateRoot : AggregateRoot, new();
         Task SaveAsync<TAggregateRoot>(TAggregateRoot aggregateRoot) where TAggregateRoot : AggregateRoot, new();
 
     }

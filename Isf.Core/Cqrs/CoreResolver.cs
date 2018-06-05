@@ -17,12 +17,12 @@ namespace Isf.Core.Cqrs
             throw new NotImplementedException();
         }
 
-        public T Resolve<T>()
+        public T GetMe<T>()
         {
             return (T)provider.GetService(typeof(T));
         }
 
-        public object Resolve(Type type)
+        public object GetMe(Type type)
         {
             return provider.GetService(type);
         }
