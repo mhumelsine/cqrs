@@ -1,10 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Isf.Core.Migrations
+namespace Inventory.Infrastructure.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,12 +13,12 @@ namespace Isf.Core.Migrations
                 {
                     EventId = table.Column<long>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AggregateRootId = table.Column<Guid>(nullable: false),
-                    EventData = table.Column<string>(nullable: true),
                     EventName = table.Column<string>(nullable: true),
-                    EventSequence = table.Column<int>(nullable: false),
                     EventTimestamp = table.Column<DateTime>(nullable: false),
-                    UserCreated = table.Column<string>(nullable: true)
+                    AggregateRootId = table.Column<Guid>(nullable: false),
+                    UserCreated = table.Column<string>(nullable: true),
+                    EventSequence = table.Column<int>(nullable: false),
+                    EventData = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

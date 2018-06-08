@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Isf.Core.Cqrs" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" />
   </ItemGroup>
@@ -16,7 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Inventory.Infrastructure\Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\Inventory\Inventory.csproj" />
-    <ProjectReference Include="..\Isf.Core.Web\Isf.Core.Web.csproj" />
   </ItemGroup>
 
 </Project>

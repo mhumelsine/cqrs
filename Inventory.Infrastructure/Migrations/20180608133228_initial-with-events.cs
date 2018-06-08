@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
 
-namespace Isf.Core.Migrations
+namespace Inventory.Infrastructure.Migrations
 {
-    public partial class update : Migration
+    public partial class initialwithevents : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

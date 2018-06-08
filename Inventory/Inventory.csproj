@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Isf.Core\Isf.Core.csproj" />
+    <PackageReference Include="Isf.Core.Cqrs" Version="1.0.5" />
   </ItemGroup>
 
 </Project>

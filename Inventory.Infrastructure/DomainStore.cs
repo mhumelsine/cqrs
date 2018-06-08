@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Inventory.Infrastructure
 {
-    public class DomainStore : EfDomainStore
+    public class DomainStore : EfDomainAndEventStore
     {
-        public DomainStore(DomainDbContext dbContext, IEventStore eventStore, IEventBus eventBus)
-            :base(dbContext, eventStore, eventBus)
+        public DomainStore(DomainDbContext dbContext, IEventBus eventBus)
+            :base(dbContext, eventBus)
         {
 
         }

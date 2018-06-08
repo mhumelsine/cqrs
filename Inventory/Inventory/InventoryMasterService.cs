@@ -1,8 +1,5 @@
-﻿using Isf.Core.Common;
+﻿using Isf.Core.Utils;
 using Isf.Core.Cqrs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Inventory.Inventory
@@ -17,10 +14,21 @@ namespace Inventory.Inventory
         {
             var db = context.GetMe<IDomainStore>();
             var command = context.Command;
+            var usernameProvider = context.GetMe<IUsernameProvider>();
 
             var master = await db.GetExistingByIdAsync<InventoryMaster>(command.AggregateRootId);
 
-            master.LIN = command.LIN;
+            //i want to see when the lin changes
+
+            if (master.LIN != command.LIN)
+            {
+                context.PublishEvent(new LinChangedEvent(
+                    master.AggregateRootId,
+                    command.LIN,
+                    usernameProvider.GetUsername()));
+            }
+
+                master.LIN = command.LIN;
             master.GeneralNomenclature = command.GeneralNomenclature;
             master.IsGArmy = command.IsGArmy;
             master.TrackingType = command.TrackingType;
@@ -28,8 +36,7 @@ namespace Inventory.Inventory
 
             await db.SaveAsync(master);
 
-            //want to track created event
-            var usernameProvider = context.GetMe<IUsernameProvider>();
+            //want to track created event            
 
             context.PublishEvent(new InventoryMasterUpdatedEvent(
                 master.AggregateRootId,

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Inventory.Infrastructure;
+﻿using Inventory.Infrastructure;
 using Inventory.Inventory;
-using Isf.Core.Common;
+using Isf.Core.Utils;
 using Isf.Core.Cqrs;
-using Isf.Core.Web;
+using Isf.Core.Cqrs.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -32,16 +28,12 @@ namespace Inventory.Web
             //need the assembly to be loaded, need a better way
             var command = new CreateInventoryMasterCommand();
 
-            services.AddDbContext<EventDbContext>(options =>
-                options.UseSqlite("Data Source = events.db"));
-            //options.UseSqlServer(Configuration.GetConnectionString("EventContext")));
-
             services.AddDbContext<DomainDbContext>(options =>
             options.UseSqlite("Data Source = domain.db"));
             //options.UseSqlServer(Configuration.GetConnectionString("DomainContext")));          
-
-            services.AddScoped<IEventStore, EfEventStore>();
+            
             services.AddScoped<IDomainStore, DomainStore>();
+            services.AddScoped<IEventStore>(provider => provider.GetService<IDomainStore>() as IEventStore);
             services.AddScoped<IUsernameProvider, StaticUsernameProvider>();
 
             //add the singleton services

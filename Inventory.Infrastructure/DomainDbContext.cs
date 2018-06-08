@@ -1,4 +1,5 @@
 ﻿using Inventory.Inventory;
+using Isf.Core.Cqrs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using System;
@@ -10,6 +11,7 @@ namespace Inventory.Infrastructure
     public class DomainDbContext : DbContext
     {
         public DbSet<InventoryMaster> InventoryMasters { get; set; }
+        public DbSet<DomainEvent> DomainEvents { get; set; }
 
         public DomainDbContext(DbContextOptions<DomainDbContext> options) : base(options)
         {
